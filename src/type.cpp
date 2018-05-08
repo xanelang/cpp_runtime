@@ -9,41 +9,29 @@
 
 // TODO using namespace std;
 
-Type::Type(const char * package, const char * library,
-		const char * name) :
-		package(package), library(library), name(name) {
-	print(this->name);
-}
-
-/*
-Type::Type(CString& package, CString& library, CString& name): package(package), library(library), name(name) {
-
-}
-
-Type::Type(CString&& package, CString&& library, CString&& name): package(package), library(library), name(name) {
-
-}
-*/
+const Type Type::xaneType = Type("Xane", "Core", "Type");
 
 bool Type::operator==(Type other) const {
-	if (!package.isEqual(other.package)) {
-		return false;
-	}
-	if (!library.isEqual(other.library)) {
-		return false;
-	}
-	if (!name.isEqual(other.name)) {
-		return false;
-	}
+	if(strcmp(name, other.name) != 0) return false;
+	if(strcmp(library, other.library) != 0) return false;
+	if(strcmp(package, other.package) != 0) return false;
 	return true;
 }
 
-
 Reference<String> Type::toString() const {
-	return package.concat(CString("::"))
-			->concat(library)
-			->concat(CString("::"))
-			->concat(name);
+	uint64_t pakLen = strlen(package);
+	uint64_t libLen = strlen(library);
+	uint64_t nameLen = strlen(name);
+	auto ret = *new String(pakLen + libLen + nameLen + 4);
+	uint64_t start = 0;
+	ret.replaceRange(start, pakLen, package);
+	start += pakLen;
+	ret.replaceRange(start, 2, "::");
+	start += 2;
+	ret.replaceRange(start, libLen, library);
+	start += libLen;
+	ret.replaceRange(start, 2, "::");
+	start += 2;
+	ret.replaceRange(start, nameLen, name);
+	return Reference<String>(&ret);
 }
-
-const Type nullType("Xane", "Core", "Null");

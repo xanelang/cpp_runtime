@@ -8,17 +8,6 @@
 #include "core.hpp"
 #include "string.h"
 
-const Type CString::xaneType("Xane", "Core", "CString");
-
-CString::CString(char const * ch): chars(ch), length(strlen(ch)) {
-}
-
-/*
-CString::CString(CString& other): chars(other.chars) {
-	// print(*this);
-}
-*/
-
 char CString::operator[](uint64_t index) const {
 	if (length <= index) {
 		// TODO throw?
@@ -88,3 +77,5 @@ Reference<String> CString::toString() const {
 const Type CString::runtimeType() const {
 	return xaneType;
 }
+
+const Type CString::xaneType("Xane", "Core", "CString");

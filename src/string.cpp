@@ -15,8 +15,6 @@
 
 using namespace std;
 
-const Type String::xaneType("Xane", "Core", "String");
-
 String::String(uint64_t length) :
 		length(length), chars((char *) malloc(length)) {
 
@@ -107,7 +105,51 @@ char String::get(Int index) const {
 	return chars[index.value];
 }
 
-bool String::isEqual(Reference<String> other) const {
+void String::set(uint64_t index, char val) {
+	if (length <= index) {
+		// TODO throw?
+	}
+	chars[index] = val;
+}
+
+void String::set(Int index, char val) {
+	if (length <= index) {
+		// TODO throw?
+	}
+	chars[index.value] = val;
+}
+
+void String::replaceRange(uint64_t start, uint64_t length, char const * val) {
+	if (length <= start || (length <= (start + length))) {
+		// TODO throw?
+	}
+	uint64_t j = 0;
+	for(uint64_t i = start; i < length; i++) {
+		chars[i] = val[j++];
+	}
+}
+
+void String::replaceRange(uint64_t start, Reference<String> string) {
+	if (length <= start || (length <= (string->length + start))) {
+		// TODO throw?
+	}
+	uint64_t j = 0;
+	for(uint64_t i = start; length > i; i++) {
+		chars[i] = string->get(j++);
+	}
+}
+
+void String::replaceRange(uint64_t start, CString& string) {
+	if (length <= start || (length <= (string.length + start))) {
+		// TODO throw?
+	}
+	uint64_t j = 0;
+	for(uint64_t i = start; string.length > i; i++) {
+		chars[i] = string[j++];
+	}
+}
+
+bool String::isEqual(Reference<String> other) {
 	if (length != other->length)
 		return false;
 	for (uint64_t i = 0; length > i; i++) {
@@ -117,11 +159,11 @@ bool String::isEqual(Reference<String> other) const {
 	return true;
 }
 
-Reference<String> String::concat(Reference<String> other) const {
+Reference<String> String::concat(Reference<String> other) {
 	return Reference<String>(new String(*this, *other));
 }
 
-Reference<String> String::concat(const CString& other) const {
+Reference<String> String::concat(CString& other) {
 	auto string = new String(length.value + other.length.value);
 	for (uint64_t i = 0; length > i; i++) {
 		string->chars[i] = get(i);
@@ -132,19 +174,19 @@ Reference<String> String::concat(const CString& other) const {
 	return Reference<String>(string);
 }
 
-Reference<String> String::concat(const Object& other) const {
+Reference<String> String::concat(Object& other) {
 	return Reference<String>(new String(*this, other.toString()));
 }
 
-Reference<String> String::concat(const Object&& other) const {
+Reference<String> String::concat(Object&& other) {
 	return Reference<String>(new String(*this, other.toString()));
 }
 
-Reference<String> String::concat(const Reference<ReferencedObject> other) const {
+Reference<String> String::concat(Reference<ReferencedObject> other) {
 	return Reference<String>(new String(*this, other.toString()));
 }
 
-Reference<String> String::toString() const {
+Reference<String> String::toString() {
 	return Reference<String>(new String(*this));
 }
 
@@ -153,13 +195,14 @@ const Type String::runtimeType() const {
 }
 
 void String::deinit() {
-
 }
 
-Reference<String> String_init_fromBytes(char const * bytes, uint64_t size) {
+Reference<String> String::init_fromBytes(char const * bytes, Int size) {
 	return Reference<String>(new String(bytes, size));
 }
 
-Reference<String> String_init_fromLiteral(char const * bytes) {
+Reference<String> String::init_fromLiteral(char const * bytes) {
 	return Reference<String>(new String(bytes, strlen(bytes)));
 }
+
+const Type String::xaneType = Type("Xane", "Core", "String");
