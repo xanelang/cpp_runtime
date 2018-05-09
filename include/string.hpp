@@ -88,6 +88,8 @@ public:
 
 	bool isEqual(Reference<String>);
 
+	Reference<String> operator+(Reference<String> other);
+
 	Reference<String> concat(Reference<String> other);
 
 	Reference<String> concat(CString& other);

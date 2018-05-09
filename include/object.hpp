@@ -12,6 +12,8 @@ class Type;
 
 class String;
 
+typedef void Void;
+
 template<typename T>
 class Reference;
 
@@ -35,17 +37,12 @@ public:
 	virtual Reference<String> toString();
 };
 
-template<typename T>
 struct RefCount {
-private:
 	uint64_t sharedCount;
 	uint64_t weakCount;
-	T* ptr;
+	ReferencedObject* ptr;
 
-	friend class Reference<T> ;
-
-public:
-	RefCount(T* ptr) :
+	RefCount(ReferencedObject* ptr) :
 			sharedCount(1), weakCount(0), ptr(ptr) {
 		if (ptr == nullptr) {
 			// TODO throw?
@@ -99,7 +96,7 @@ public:
 template<typename T>
 class Reference {
 private:
-	RefCount<T>* __rc__;
+	RefCount* __rc__;
 
 public:
 	Reference() :
@@ -107,7 +104,12 @@ public:
 	}
 
 	Reference(T* ptr) :
-			__rc__(new RefCount<T>(ptr)) {
+			__rc__(new RefCount(ptr)) {
+	}
+
+	Reference(RefCount* counter) :
+			__rc__(counter) {
+		__rc__->incrementShared();
 	}
 
 	Reference(Reference<T>& other) :
@@ -139,7 +141,7 @@ public:
 
 	void operator=(T* other) {
 		clear();
-		__rc__ = new RefCount<T>(other);
+		__rc__ = new RefCount(other);
 	}
 
 	bool isValid() const {
@@ -164,14 +166,26 @@ public:
 		if (__rc__ == nullptr) {
 			// TODO throw
 		}
-		return *__rc__->ptr;
+		return *dynamic_cast<T*>(__rc__->ptr);
 	}
 
 	T* operator->() const {
 		if (__rc__ == nullptr) {
 			// TODO throw
 		}
-		return __rc__->ptr;
+		return dynamic_cast<T*>(__rc__->ptr);
+	}
+
+	template<class NT>
+	Reference<NT> cast() {
+		if (__rc__ == nullptr) {
+			// TODO throw
+		}
+		NT* cast = dynamic_cast<NT*>(__rc__->ptr);
+		if(cast == nullptr) {
+			// TODO throw
+		}
+		return Reference<NT>(__rc__);
 	}
 
 	Type runtimeType() const;
@@ -205,7 +219,8 @@ public:
 
 class Null: public ReferencedObject {
 public:
-	constexpr Null() {}
+	constexpr Null() {
+	}
 
 	static constexpr Type xaneType = Type("Xane", "Core", "Null");
 };

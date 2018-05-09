@@ -159,6 +159,10 @@ bool String::isEqual(Reference<String> other) {
 	return true;
 }
 
+Reference<String> String::operator+(Reference<String> other) {
+	return Reference<String>(new String(*this, *other));
+}
+
 Reference<String> String::concat(Reference<String> other) {
 	return Reference<String>(new String(*this, *other));
 }
