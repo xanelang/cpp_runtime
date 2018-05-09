@@ -36,8 +36,8 @@ void print(const CString&& string, bool newLine) {
 		putchar('\n');
 }
 
-void print(Object object, bool newLine) {
-	auto string = object.toString();
+void print(Object* object, bool newLine) {
+	auto string = object->toString();
 	for (uint64_t i = 0; string->length > i; i++) {
 		putchar(string->get(i));
 	}

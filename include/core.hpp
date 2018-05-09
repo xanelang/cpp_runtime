@@ -25,7 +25,7 @@ void print(CString& string, bool newLine = true);
 
 void print(CString&& string, bool newLine = true);
 
-void print(Object object, bool newLine);
+void print(Object* object, bool newLine);
 
 void print(Reference<Object> object, bool newLine);
 
