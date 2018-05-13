@@ -7,7 +7,7 @@
 
 #include "core.hpp"
 
-const Type Object::runtimeType() {
+Type Object::runtimeType() {
 	return anyType;
 }
 
@@ -22,7 +22,7 @@ void ReferencedObject::deinit() {
 ReferencedObject::~ReferencedObject() {
 }
 
-const Type ReferencedObject::runtimeType() {
+Type ReferencedObject::runtimeType() {
 	return anyType;
 }
 

@@ -20,7 +20,7 @@ class Reference;
 /// Base class for a Xane Object
 class Object {
 public:
-	virtual const Type runtimeType();
+	virtual Type runtimeType();
 
 	virtual Reference<String> toString();
 };
@@ -32,7 +32,7 @@ public:
 
 	virtual void deinit();
 
-	virtual const Type runtimeType();
+	virtual Type runtimeType();
 
 	virtual Reference<String> toString();
 };
@@ -177,7 +177,7 @@ public:
 	}
 
 	template<class NT>
-	Reference<NT> cast() {
+	Reference<NT> as() {
 		if (__rc__ == nullptr) {
 			// TODO throw
 		}
