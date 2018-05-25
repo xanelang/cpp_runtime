@@ -1,28 +1,0 @@
-[1mdiff --git a/include/core.hpp b/include/core.hpp[m
-[1mindex 008c935..4609bc1 100644[m
-[1m--- a/include/core.hpp[m
-[1m+++ b/include/core.hpp[m
-[36m@@ -25,7 +25,7 @@[m [mvoid print(CString& string, bool newLine = true);[m
- [m
- void print(CString&& string, bool newLine = true);[m
- [m
-[31m-void print(Object object, bool newLine);[m
-[32m+[m[32mvoid print(Object* object, bool newLine);[m[41m[m
- [m
- void print(Reference<Object> object, bool newLine);[m
- [m
-[1mdiff --git a/src/core.cpp b/src/core.cpp[m
-[1mindex b6be41b..e222bb5 100644[m
-[1m--- a/src/core.cpp[m
-[1m+++ b/src/core.cpp[m
-[36m@@ -36,8 +36,8 @@[m [mvoid print(const CString&& string, bool newLine) {[m
- 		putchar('\n');[m
- }[m
- [m
-[31m-void print(Object object, bool newLine) {[m
-[31m-	auto string = object.toString();[m
-[32m+[m[32mvoid print(Object* object, bool newLine) {[m[41m[m
-[32m+[m	[32mauto string = object->toString();[m[41m[m
- 	for (uint64_t i = 0; string->length > i; i++) {[m
- 		putchar(string->get(i));[m
- 	}[m

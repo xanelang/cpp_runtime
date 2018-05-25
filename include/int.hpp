@@ -27,6 +27,16 @@ public:
 			value(v) {
 	}
 
+	Int& operator++() {
+		value++;
+		return *this;
+	}
+
+	Int& operator--() {
+		value--;
+		return *this;
+	}
+
 	Int operator+(Int other) const {
 		return Int(value + other.value);
 	}

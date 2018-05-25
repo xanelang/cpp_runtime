@@ -13,17 +13,20 @@
 
 using namespace std;
 
-template<typename ElementType, size_t size>
-class ArrayIterator;
+template<typename ElementType>
+class Iterator;
 
-template<typename ElementType, size_t size>
-class FixedSizedContainer: public Object {
-public:
+template<typename ElementType>
+struct Iterable: Object {
+	virtual Iterator<ElementType> iterator() = 0;
+
 	virtual Int length() = 0;
 
-	virtual ElementType first() = 0;
+	virtual bool isEmpty() = 0;
 
-	virtual ArrayIterator<ElementType, size> iterator() = 0;
+	virtual bool isNotEmpty() = 0;
+
+	virtual ElementType first() = 0;
 
 	virtual ElementType last() = 0;
 
@@ -43,13 +46,13 @@ public:
 };
 
 template<typename ElementType, size_t size>
-class Array: virtual public FixedSizedContainer<ElementType, size> {
+class Array: virtual public Iterable<ElementType> {
 	ElementType _elements[size];
 public:
 	Array(initializer_list<ElementType> elements) {
 		// TODO check if elements size is size
 		auto it = elements.begin();
-		for(uint64_t i = 0; i < size; i++) {
+		for (uint64_t i = 0; i < size; i++) {
 			_elements[i] = *it++;
 		}
 	}
@@ -58,16 +61,25 @@ public:
 		return size;
 	}
 
+	bool isEmpty() {
+		return size == 0;
+	}
+
+	bool isNotEmpty() {
+		return size != 0;
+	}
+
 	ElementType first() {
 		// TODO throw or return optional?
 		return _elements[0];
 	}
 
-	ArrayIterator<ElementType, size> iterator() {
-		return ArrayIterator<ElementType, size>(*this, 0, size - 1);
+	Iterator<ElementType> iterator() {
+		return Iterator<ElementType>(this, 0);
 	}
 
 	ElementType last() {
+		// TODO check if not empty
 		return _elements[size - 1];
 	}
 
@@ -117,36 +129,60 @@ public:
 template<typename ElementType, size_t size>
 const Type Array<ElementType, size>::xaneType = Type("Xane", "Core", "Array");
 
-template<typename ElementType, size_t size>
-class ArrayIterator: public Object {
-	Array<ElementType, size>& _array;
+template<typename ElementType>
+class Iterator: public Object {
+	Iterable<ElementType>* _iterable;
 
 	uint64_t _index;
-
-	uint64_t _last;
 public:
-	ArrayIterator(Array<ElementType, size>& array, uint64_t start,
-			uint64_t last) :
-			_array(array), _index(start), _last(last) {
+	Iterator(): _iterable(nullptr), _index(0) {
+
+	}
+
+	Iterator(Iterable<ElementType>* array, uint64_t start) :
+			_iterable(array), _index(start) {
+	}
+
+	Iterator(const Iterator& other): _iterable(other._iterable), _index(other._index) {
+
+	}
+
+	Iterator(const Iterator&& other): _iterable(other._iterable), _index(other._index) {
+
+	}
+
+	Iterator& operator=(const Iterator& other) {
+		_iterable = other._iterable;
+		_index = other._index;
+		return *this;
+	}
+
+	Iterator& operator=(const Iterator&& other) {
+		_iterable = other._iterable;
+		_index = other._index;
+		return *this;
+	}
+
+	Bool hasCurrent() {
+		return _iterable->length() > _index;
+	}
+
+	Bool hasNext() {
+		return _iterable->length() > (_index + 1);
 	}
 
 	ElementType current() {
 		// TODO throw if _list has been modified
-		return _array.get(_index);
+		return _iterable->get(_index);
 	}
 
 	Bool moveNext() {
 		// TODO throw if _list has been modified
-		if (_index >= _last) {
+		if (_iterable->length() <= (_index + 1)) {
 			return false;
 		}
 		_index++;
 		return true;
-	}
-
-	Bool hasNext() {
-		// TODO throw if _list has been modified
-		return _index < _last;
 	}
 
 	const Type runtimeType() {
@@ -155,13 +191,13 @@ public:
 
 	Reference<String> toString() {
 		// TODO
-		return Reference<String>(String::init_fromLiteral("ArrayIterator"));
+		return Reference<String>(String::init_fromLiteral("Iterator"));
 	}
 
 	static const Type xaneType;
 };
 
-template<typename ElementType, size_t size>
-const Type ArrayIterator<ElementType, size>::xaneType("Xane", "Core", "ArrayIterator");
+template<typename ElementType>
+const Type Iterator<ElementType>::xaneType("Xane", "Core", "Iterator");
 
 #endif /* INCLUDE_ARRAY_HPP_ */

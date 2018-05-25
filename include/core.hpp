@@ -18,6 +18,7 @@
 #include "double.hpp"
 #include "string.hpp"
 #include "array.hpp"
+#include "vector.hpp"
 
 void print(Reference<String> string, bool newLine = true);
 
